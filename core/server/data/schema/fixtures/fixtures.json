@@ -89,6 +89,31 @@
                     "object_type": "notification"
                 },
                 {
+                    "name": "Browse products",
+                    "action_type": "browse",
+                    "object_type": "product"
+                },
+                {
+                    "name": "Read products",
+                    "action_type": "read",
+                    "object_type": "product"
+                },
+                {
+                    "name": "Edit products",
+                    "action_type": "edit",
+                    "object_type": "product"
+                },
+                {
+                    "name": "Add products",
+                    "action_type": "add",
+                    "object_type": "product"
+                },
+                {
+                    "name": "Delete products",
+                    "action_type": "destroy",
+                    "object_type": "product"
+                },
+                {
                     "name": "Browse posts",
                     "action_type": "browse",
                     "object_type": "post"
@@ -414,6 +439,29 @@
                     "profile_image": "https://static.ghost.org/v3.0.0/images/ghost.png"
                 }
             ]
+        },
+        {
+            "name": "Product",
+            "entries": [
+                {
+                    "title": "Product title",
+                    "slug": "organising-content",                    
+                    "featured": false,
+                    "type": "product",
+                    "status": "published",
+                    "meta_title": null,
+                    "meta_description": null,
+                    "created_by": "1",
+                    "published_by": "1",
+                    "author_id": "1",
+                    "custom_excerpt": "A product.",
+                    "feature_image": "https://static.ghost.org/v3.0.0/images/organising-your-content.png"
+                }
+            ]
+        },
+        {
+            "name": "Sale",
+            "entries": []
         },
         {
             "name": "Post",

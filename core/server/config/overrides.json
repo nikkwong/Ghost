@@ -20,7 +20,7 @@
         ]
     },
     "slugs": {
-        "protected": ["ghost", "rss", "amp"]
+        "protected": ["admin", "rss", "amp"]
     },
     "uploads": {
         "members": {

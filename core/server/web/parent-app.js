@@ -9,6 +9,7 @@ const escapeRegExp = require('lodash.escaperegexp');
 const {URL} = require('url');
 const urlUtils = require('../lib/url-utils');
 const storage = require('../adapters/storage');
+const BF_CONFIG = require('../../../bf-custom/config')
 
 const STATIC_IMAGE_URL_PREFIX = `/${urlUtils.STATIC_IMAGE_URL_PREFIX}`;
 
@@ -27,6 +28,10 @@ module.exports = function setupParentApp(options = {}) {
 
     // Register event emmiter on req/res to trigger cache invalidation webhook event
     parentApp.use(shared.middlewares.emitEvents);
+    parentApp.all('*', function(req,res,next) {
+        console.log('xxx')
+        next()
+    })
 
     // enabled gzip compression by default
     if (config.get('compress') !== false) {
@@ -53,9 +58,9 @@ module.exports = function setupParentApp(options = {}) {
 
     // Wrap the admin and API apps into a single express app for use with vhost
     const adminApp = express();
-    adminApp.enable('trust proxy'); // required to respect x-forwarded-proto in admin requests
-    adminApp.use('/ghost/api', require('./api')());
-    adminApp.use('/ghost', require('./admin')());
+    adminApp.enable('trust proxy'); // required to respect x-forwarded-proto in admin requests 
+    adminApp.use(`/${BF_CONFIG.adminPath}/api`, require('./api')());
+    adminApp.use(`/${BF_CONFIG.adminPath}`, require('./admin')());
 
     // TODO: remove {admin url}/content/* once we're sure the API is not returning relative asset URLs anywhere
     // only register this route if the admin is separate so we're not overriding the {site}/content/* route

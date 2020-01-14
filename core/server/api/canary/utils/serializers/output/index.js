@@ -55,6 +55,10 @@ module.exports = {
         return require('./notifications');
     },
 
+    get products() {
+        return require('./products');
+    },
+    
     get mail() {
         return require('./mail');
     },

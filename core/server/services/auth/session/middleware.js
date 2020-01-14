@@ -7,6 +7,7 @@ const settingsCache = require('../../settings/cache');
 const models = require('../../../models');
 const SessionStore = require('./store');
 const urlUtils = require('../../../lib/url-utils');
+const BF_CONFIG = require('../../../../../bf-custom/config')
 
 const getOrigin = (req) => {
     const origin = req.get('origin');
@@ -39,7 +40,7 @@ const getSession = (req, res, next) => {
             cookie: {
                 maxAge: constants.SIX_MONTH_MS,
                 httpOnly: true,
-                path: urlUtils.getSubdir() + '/ghost',
+                path: urlUtils.getSubdir() + `/${BF_CONFIG.adminPath}`,
                 sameSite: 'lax',
                 secure: urlUtils.isSSL(config.get('url'))
             }

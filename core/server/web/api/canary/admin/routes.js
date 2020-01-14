@@ -30,6 +30,14 @@ module.exports = function apiRoutes() {
     router.get('/posts/slug/:slug', mw.authAdminApi, http(apiCanary.posts.read));
     router.put('/posts/:id', mw.authAdminApi, http(apiCanary.posts.edit));
     router.del('/posts/:id', mw.authAdminApi, http(apiCanary.posts.destroy));
+    
+    // ## Products
+    router.get('/products', mw.authAdminApi, http(apiCanary.products.browse));
+    router.post('/products', mw.authAdminApi, http(apiCanary.products.add));
+    router.get('/products/:id', mw.authAdminApi, http(apiCanary.products.read));
+    router.get('/products/slug/:slug', mw.authAdminApi, http(apiCanary.products.read));
+    router.put('/products/:id', mw.authAdminApi, http(apiCanary.products.edit));
+    router.del('/products/:id', mw.authAdminApi, http(apiCanary.products.destroy));
 
     // ## Pages
     router.get('/pages', mw.authAdminApi, http(apiCanary.pages.browse));

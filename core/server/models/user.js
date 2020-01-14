@@ -119,6 +119,7 @@ User = ghostBookshelf.Model.extend({
          *
          * Before we can generate a slug, we have to ensure that the name is not blank.
          */
+        console.log(this)
         if (!this.get('name')) {
             throw new common.errors.ValidationError({
                 message: common.i18n.t('notices.data.validation.index.valueCannotBeBlank', {
@@ -453,6 +454,7 @@ User = ghostBookshelf.Model.extend({
         }
 
         ops.push(function update() {
+            // this saves the model
             return ghostBookshelf.Model.edit.call(self, data, options).then((user) => {
                 var roleId;
 
@@ -464,6 +466,7 @@ User = ghostBookshelf.Model.extend({
 
                 return user.roles().fetch().then((roles) => {
                     // return if the role is already assigned
+                    debugger
                     if (roles.models[0].id === roleId) {
                         return;
                     }

@@ -9,7 +9,7 @@
         },
         "api": {
             "authentication": {
-                "sampleBlogDescription": "Thoughts, stories and ideas.",
+                "sampleBlogDescription": "Doobies, stories and ideas.",
                 "mail": {
                     "resetPassword": "Reset Password",
                     "checkEmailForInstructions": "Check your email for further instructions.",

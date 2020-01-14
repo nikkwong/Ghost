@@ -31,3 +31,4 @@ module.exports = function adminController(req, res) {
 
     res.sendFile(templatePath, {headers});
 };
+  

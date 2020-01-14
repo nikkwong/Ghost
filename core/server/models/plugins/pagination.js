@@ -124,6 +124,7 @@ paginationUtils = {
  * @param {Bookshelf} bookshelf \- the instance to plug into
  */
 pagination = function pagination(bookshelf) {
+    global.bs = bookshelf
     // Extend updates the first object passed to it, no need for an assignment
     _.extend(bookshelf.Model.prototype, {
         /**
@@ -139,6 +140,7 @@ pagination = function pagination(bookshelf) {
          */
         fetchPage: function fetchPage(options) {
             // Setup pagination options
+            // global.q = this.query()
             options = paginationUtils.parseOptions(options);
 
             // Get the table name and idAttribute for this model
@@ -152,10 +154,12 @@ pagination = function pagination(bookshelf) {
                     bookshelf.knex.raw('count(distinct ' + tableName + '.' + idAttribute + ') as aggregate')
                 );
             } else {
+                //@BF-TODO BUG
                 countPromise = this.query().clone().select(
                     bookshelf.knex.raw('count(distinct ' + tableName + '.' + idAttribute + ') as aggregate')
                 );
             }
+            global.q = this.query().clone()
             // #### Pre count clauses
             // Add any where or join clauses which need to be included with the aggregate query
 
@@ -169,7 +173,7 @@ pagination = function pagination(bookshelf) {
                 paginationUtils.addLimitAndOffset(self, options);
 
                 // Apply ordering options if they are present
-                if (options.order && !_.isEmpty(options.order)) {
+                if (options.order && !_.isEmpty(options.order)) {  
                     _.forOwn(options.order, function (direction, property) {
                         if (property === 'count.posts') {
                             self.query('orderBy', 'count__posts', direction);

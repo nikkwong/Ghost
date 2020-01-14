@@ -20,6 +20,7 @@ models = [
     'app',
     'permission',
     'post',
+    'product',
     'role',
     'settings',
     'session',
@@ -35,6 +36,7 @@ models = [
     'member',
     'action',
     'posts-meta',
+    'products-meta',
     'member-stripe-customer',
     'stripe-customer-subscription',
     'email'
@@ -53,3 +55,4 @@ function init() {
  */
 
 exports.init = init;
+ 

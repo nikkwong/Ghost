@@ -51,6 +51,10 @@ module.exports = {
         return shared.pipeline(require('./posts'), localUtils);
     },
 
+    get products() {
+        return shared.pipeline(require('./products'), localUtils);
+    },
+
     get invites() {
         return shared.pipeline(require('./invites'), localUtils);
     },
@@ -145,6 +149,10 @@ module.exports = {
 
     get postsPublic() {
         return shared.pipeline(require('./posts-public'), localUtils, 'content');
+    },
+    
+    get productsPublic() {
+        return shared.pipeline(require('./products-public'), localUtils, 'content');
     },
 
     get authorsPublic() {

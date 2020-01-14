@@ -7,6 +7,11 @@ module.exports = function setupApiApp() {
     debug('Parent API setup start');
     const apiApp = express();
 
+    apiApp.all('*', function(req,res,next) {
+        console.log('zzzz')
+        next()
+    })
+
     // Mount different API versions
     apiApp.use(urlUtils.getVersionPath({version: 'v2', type: 'content'}), require('./v2/content/app')());
     apiApp.use(urlUtils.getVersionPath({version: 'v2', type: 'admin'}), require('./v2/admin/app')());

@@ -15,6 +15,7 @@ module.exports = {
         validation: {
             docName: 'setup'
         },
+        // #BF called for 1st setup
         query(frame) {
             return Promise.resolve()
                 .then(() => {
@@ -32,6 +33,7 @@ module.exports = {
                     return auth.setup.setupUser(setupDetails);
                 })
                 .then((data) => {
+                    debugger
                     return auth.setup.doSettings(data, api.settings);
                 })
                 .then((user) => {

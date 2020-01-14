@@ -15,14 +15,16 @@
 const urlUtils = require('../../../lib/url-utils');
 const common = require('../../../lib/common');
 const localUtils = require('../utils');
+const BF_CONFIG = require('../../../../../bf-custom/config')
 
 const uncapitalise = (req, res, next) => {
     let pathToTest = (req.baseUrl ? req.baseUrl : '') + req.path;
     let redirectPath;
     let decodedURI;
 
-    const isSignupOrReset = pathToTest.match(/^(.*\/ghost\/(signup|reset)\/)/i),
-        isAPI = pathToTest.match(/^(.*\/ghost\/api\/(v[\d.]+|canary)\/.*?\/)/i);
+    // BF_CONFIG.adminPath
+    const isSignupOrReset = pathToTest.match(/^(.*\/admin\/(signup|reset)\/)/i),
+        isAPI = pathToTest.match(/^(.*\/admin\/api\/(v[\d.]+|canary)\/.*?\/)/i);
 
     if (isSignupOrReset) {
         pathToTest = isSignupOrReset[1];

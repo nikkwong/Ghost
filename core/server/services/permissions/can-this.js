@@ -15,6 +15,7 @@ CanThisResult = function () {
 CanThisResult.prototype.buildObjectTypeHandlers = function (objTypes, actType, context, permissionLoad) {
     var objectTypeModelMap = {
         post: models.Post,
+        product: models.Product,
         role: models.Role,
         user: models.User,
         permission: models.Permission,
@@ -43,7 +44,7 @@ CanThisResult.prototype.buildObjectTypeHandlers = function (objTypes, actType, c
                 modelId = modelOrId;
             } else if (modelOrId) {
                 // It's a model, get the id
-                modelId = modelOrId.id;
+                modelId = modelOrId.id; 
             }
             // Wait for the user loading to finish
             return permissionLoad.then(function (loadedPermissions) {

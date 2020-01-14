@@ -1,4 +1,4 @@
-// # Post Model
+// # Product Model
 const _ = require('lodash');
 const uuid = require('uuid');
 const moment = require('moment');
@@ -15,12 +15,12 @@ const urlUtils = require('../lib/url-utils');
 const MOBILEDOC_REVISIONS_COUNT = 10;
 const ALL_STATUSES = ['published', 'draft', 'scheduled'];
 
-let Post;
-let Posts;
+let Product;
+let Products;
 
-Post = ghostBookshelf.Model.extend({
+Product = ghostBookshelf.Model.extend({
 
-    tableName: 'posts',
+    tableName: 'products',
 
     /**
      * @NOTE
@@ -34,7 +34,7 @@ Post = ghostBookshelf.Model.extend({
      *   - Bookshelf just returns the model values which you have asked Bookshelf to insert
      *      - it can't return the `defaultTo` value from the schema/db level
      *      - but the db defaults defined in the schema are saved in the database correctly
-     *   - `models.Post.add` always does to operations:
+     *   - `models.Product.add` always does to operations:
      *      1. add
      *      2. fetch (this ensures we fetch the whole resource from the database)
      *   - that means we have to apply the defaults on the model layer to ensure a complete field set
@@ -53,18 +53,17 @@ Post = ghostBookshelf.Model.extend({
             uuid: uuid.v4(),
             status: 'draft',
             featured: false,
-            type: 'post',
+            type: 'product',
             visibility: visibility
         };
     },
 
-    relationships: ['tags', 'authors', 'mobiledoc_revisions', 'posts_meta'],
+    relationships: ['tags', 'mobiledoc_revisions', 'products_meta'],
 
     // NOTE: look up object, not super nice, but was easy to implement
     relationshipBelongsTo: {
         tags: 'tags',
-        authors: 'users',
-        posts_meta: 'posts_meta'
+        products_meta: 'products_meta'
     },
 
     /**
@@ -96,8 +95,8 @@ Post = ghostBookshelf.Model.extend({
     },
 
     /**
-     * We update the tags after the Post was inserted.
-     * We update the tags before the Post was updated, see `onSaving` event.
+     * We update the tags after the Product was inserted.
+     * We update the tags before the Product was updated, see `onSaving` event.
      * `onCreated` is called before `onSaved`.
      *
      * `onSaved` is the last event in the line - triggered for updating or inserting data.
@@ -230,18 +229,6 @@ Post = ghostBookshelf.Model.extend({
                 });
             });
         });
-
-        model.related('authors').once('detaching', function onDetached(collection, author) {
-            model.related('authors').once('detached', function onDetached(detachedCollection, response, options) {
-                author.emitChange('detached', options);
-            });
-        });
-
-        model.related('authors').once('attaching', function onDetached(collection, authors) {
-            model.related('authors').once('attached', function onDetached(detachedCollection, response, options) {
-                authors.forEach(author => author.emitChange('attached', options));
-            });
-        });
     },
 
     /**
@@ -254,12 +241,14 @@ Post = ghostBookshelf.Model.extend({
         model.related('tags').forEach((tag) => {
             tag.emitChange('attached', options);
         });
-
-        model.related('authors').forEach((author) => {
-            author.emitChange('attached', options);
-        });
     },
 
+    /**
+     * Run when models are created, including migrations
+     * @param {*} model 
+     * @param {*} attr 
+     * @param {*} options 
+     */
     onSaving: function onSaving(model, attr, options) {
         options = options || {};
 
@@ -305,13 +294,13 @@ Post = ghostBookshelf.Model.extend({
                 // CASE: to schedule/reschedule a post, a minimum diff of x minutes is needed (default configured is 2minutes)
             } else if (
                 publishedAtHasChanged &&
-                moment(publishedAt).isBefore(moment().add(config.get('times').cannotScheduleAPostBeforeInMinutes, 'minutes')) &&
+                moment(publishedAt).isBefore(moment().add(config.get('times').cannotScheduleAProductBeforeInMinutes, 'minutes')) &&
                 !options.importing &&
                 (!options.context || !options.context.internal)
             ) {
                 return Promise.reject(new common.errors.ValidationError({
                     message: common.i18n.t('errors.models.post.expectedPublishedAtInFuture', {
-                        cannotScheduleAPostBeforeInMinutes: config.get('times').cannotScheduleAPostBeforeInMinutes
+                        cannotScheduleAProductBeforeInMinutes: config.get('times').cannotScheduleAProductBeforeInMinutes
                     })
                 }));
             }
@@ -336,18 +325,18 @@ Post = ghostBookshelf.Model.extend({
         }
 
         /**
-         * CASE: Attach id to update existing posts_meta entry for a post
-         * CASE: Don't create new posts_meta entry if post meta is empty
+         * CASE: Attach id to update existing products_meta entry for a post
+         * CASE: Don't create new products_meta entry if post meta is empty
          */
-        if (!_.isUndefined(this.get('posts_meta')) && !_.isNull(this.get('posts_meta'))) {
-            let postsMetaData = this.get('posts_meta');
-            let relatedModelId = model.related('posts_meta').get('id');
-            let hasNoData = !_.values(postsMetaData).some(x => !!x);
-            if (relatedModelId && !_.isEmpty(postsMetaData)) {
-                postsMetaData.id = relatedModelId;
-                this.set('posts_meta', postsMetaData);
-            } else if (_.isEmpty(postsMetaData) || hasNoData) {
-                this.set('posts_meta', null);
+        if (!_.isUndefined(this.get('products_meta')) && !_.isNull(this.get('products_meta'))) {
+            let productsMetaData = this.get('products_meta');
+            let relatedModelId = model.related('products_meta').get('id');
+            let hasNoData = !_.values(productsMetaData).some(x => !!x);
+            if (relatedModelId && !_.isEmpty(productsMetaData)) {
+                productsMetaData.id = relatedModelId;
+                this.set('products_meta', productsMetaData);
+            } else if (_.isEmpty(productsMetaData) || hasNoData) {
+                this.set('products_meta', null);
             }
         }
 
@@ -409,7 +398,7 @@ Post = ghostBookshelf.Model.extend({
             } catch (err) {
                 throw new common.errors.ValidationError({
                     message: 'Invalid mobiledoc structure.',
-                    help: 'https://ghost.org/docs/concepts/posts/'
+                    help: 'https://ghost.org/docs/concepts/products/'
                 });
             }
         }
@@ -462,7 +451,7 @@ Post = ghostBookshelf.Model.extend({
             this.set('send_email_when_published', true);
         }
 
-        // ensure draft posts have the send_email_when_published reset unless an email has already been sent
+        // ensure draft products have the send_email_when_published reset unless an email has already been sent
         if (newStatus === 'draft' && this.hasChanged('status')) {
             ops.push(function ensureSendEmailWhenPublishedIsUnchanged() {
                 return self.related('email').fetch({transacting: options.transacting}).then((email) => {
@@ -479,11 +468,11 @@ Post = ghostBookshelf.Model.extend({
         if (prevTitle !== undefined && newTitle !== prevTitle && newStatus === 'draft' && !publishedAt) {
             ops.push(function updateSlug() {
                 // Pass the new slug through the generator to strip illegal characters, detect duplicates
-                return ghostBookshelf.Model.generateSlug(Post, self.get('title'),
+                return ghostBookshelf.Model.generateSlug(Product, self.get('title'),
                     {status: 'all', transacting: options.transacting, importing: options.importing})
                     .then(function then(slug) {
                         // After the new slug is found, do another generate for the old title to compare it to the old slug
-                        return ghostBookshelf.Model.generateSlug(Post, prevTitle,
+                        return ghostBookshelf.Model.generateSlug(Product, prevTitle,
                             {status: 'all', transacting: options.transacting, importing: options.importing}
                         ).then(function then(prevTitleSlug) {
                             // If the old slug is the same as the slug that was generated from the old title
@@ -499,7 +488,7 @@ Post = ghostBookshelf.Model.extend({
                 // If any of the attributes above were false, set initial slug and check to see if slug was changed by the user
                 if (self.hasChanged('slug') || !self.get('slug')) {
                     // Pass the new slug through the generator to strip illegal characters, detect duplicates
-                    return ghostBookshelf.Model.generateSlug(Post, self.get('slug') || self.get('title'),
+                    return ghostBookshelf.Model.generateSlug(Product, self.get('slug') || self.get('title'),
                         {status: 'all', transacting: options.transacting, importing: options.importing})
                         .then(function then(slug) {
                             self.set({slug: slug});
@@ -515,30 +504,30 @@ Post = ghostBookshelf.Model.extend({
             ops.push(function updateRevisions() {
                 return ghostBookshelf.model('MobiledocRevision')
                     .findAll(Object.assign({
-                        filter: `post_id:${model.id}`,
+                        filter: `product_id:${model.id}`,
                         columns: ['id']
                     }, _.pick(options, 'transacting')))
                     .then((revisions) => {
                         /**
                          * Store prev + latest mobiledoc content, because we have decided against a migration, which
-                         * iterates over all posts and creates a copy of the current mobiledoc content.
+                         * iterates over all products and creates a copy of the current mobiledoc content.
                          *
                          * Reasons:
                          *   - usually migrations for the post table are slow and error-prone
-                         *   - there is no need to create a copy for all posts now, because we only want to ensure
-                         *     that posts, which you are currently working on, are getting a content backup
-                         *   - no need to create revisions for existing published posts
+                         *   - there is no need to create a copy for all products now, because we only want to ensure
+                         *     that products, which you are currently working on, are getting a content backup
+                         *   - no need to create revisions for existing published products
                          *
                          * The feature is very minimal in the beginning. As soon as you update to this Ghost version,
                          * you
                          */
                         if (!revisions.length && options.method !== 'insert') {
                             model.set('mobiledoc_revisions', [{
-                                post_id: model.id,
+                                product_id: model.id,
                                 mobiledoc: model.previous('mobiledoc'),
                                 created_at_ts: Date.now() - 1
                             }, {
-                                post_id: model.id,
+                                product_id: model.id,
                                 mobiledoc: model.get('mobiledoc'),
                                 created_at_ts: Date.now()
                             }]);
@@ -546,7 +535,7 @@ Post = ghostBookshelf.Model.extend({
                             const revisionsJSON = revisions.toJSON().slice(0, MOBILEDOC_REVISIONS_COUNT - 1);
 
                             model.set('mobiledoc_revisions', revisionsJSON.concat([{
-                                post_id: model.id,
+                                product_id: model.id,
                                 mobiledoc: model.get('mobiledoc'),
                                 created_at_ts: Date.now()
                             }]));
@@ -554,6 +543,8 @@ Post = ghostBookshelf.Model.extend({
                     });
             });
         }
+
+        console.log('complete')
 
         return sequence(ops);
     },
@@ -570,14 +561,8 @@ Post = ghostBookshelf.Model.extend({
         return this.belongsTo('User', 'published_by');
     },
 
-    authors: function authors() {
-        return this.belongsToMany('User', 'posts_authors', 'post_id', 'author_id')
-            .withPivot('sort_order')
-            .query('orderBy', 'sort_order', 'ASC');
-    },
-
     tags: function tags() {
-        return this.belongsToMany('Tag', 'posts_tags', 'post_id', 'tag_id')
+        return this.belongsToMany('Tag', 'products_tags', 'product_id', 'tag_id')
             .withPivot('sort_order')
             .query('orderBy', 'sort_order', 'ASC');
     },
@@ -587,15 +572,16 @@ Post = ghostBookshelf.Model.extend({
     },
 
     mobiledoc_revisions() {
-        return this.hasMany('MobiledocRevision', 'post_id');
+        return this.hasMany('MobiledocRevision', 'product_id');
     },
 
-    posts_meta: function postsMeta() {
-        return this.hasOne('PostsMeta', 'post_id');
+    products_meta: function productsMeta() {
+        return this.hasOne('ProductsMeta', 'product_id');
     },
 
     email: function email() {
-        return this.hasOne('Email', 'post_id');
+        // @BF-TODO
+        // return this.hasOne('Email', 'product_id');
     },
 
     /**
@@ -619,11 +605,11 @@ Post = ghostBookshelf.Model.extend({
      *   - but you only fetched the id column, this will trouble (!), because the event hooks require more
      *     data than just the id
      *   - @TODO: we need to disallow this (!)
-     *   - you should use `models.Post.edit(..)`
+     *   - you should use `models.Product.edit(..)`
      *      - this disallows using the `columns` option
-     *   - same for destroy - you should use `models.Post.destroy(...)`
+     *   - same for destroy - you should use `models.Product.destroy(...)`
      *
-     * @IMPORTANT: This fn should **never** be used when updating models (models.Post.edit)!
+     * @IMPORTANT: This fn should **never** be used when updating models (models.Product.edit)!
      *            Because the events for updating a resource require most of the fields.
      *            This is protected by the fn `permittedOptions`.
      */
@@ -639,7 +625,7 @@ Post = ghostBookshelf.Model.extend({
             formatsToKeep = options.formats || defaultFormats;
 
         // Iterate over all known formats, and if they are not in the keep list, remove them
-        _.each(Post.allowedFormats, function (format) {
+        _.each(Product.allowedFormats, function (format) {
             if (formatsToKeep.indexOf(format) === -1) {
                 delete attrs[format];
             }
@@ -649,7 +635,7 @@ Post = ghostBookshelf.Model.extend({
     },
 
     toJSON: function toJSON(unfilteredOptions) {
-        var options = Post.filterOptions(unfilteredOptions, 'toJSON'),
+        var options = Product.filterOptions(unfilteredOptions, 'toJSON'),
             attrs = ghostBookshelf.Model.prototype.toJSON.call(this, options);
 
         attrs = this.formatsToJSON(attrs, options);
@@ -677,7 +663,7 @@ Post = ghostBookshelf.Model.extend({
             return null;
         }
 
-        return options.context && options.context.public ? 'type:post' : 'type:post+status:published';
+        return options.context && options.context.public ? 'type:product' : 'type:product+status:published';
     },
 
     /**
@@ -724,7 +710,7 @@ Post = ghostBookshelf.Model.extend({
         return {
             event: event,
             resource_id: this.id || this.previous('id'),
-            resource_type: 'post',
+            resource_type: 'product',
             actor_id: actor.id,
             actor_type: actor.type
         };
@@ -743,22 +729,22 @@ Post = ghostBookshelf.Model.extend({
 
     orderDefaultRaw: function (options) {
         let order = '' +
-            'CASE WHEN posts.status = \'scheduled\' THEN 1 ' +
-            'WHEN posts.status = \'draft\' THEN 2 ' +
+            'CASE WHEN products.status = \'scheduled\' THEN 1 ' +
+            'WHEN products.status = \'draft\' THEN 2 ' +
             'ELSE 3 END ASC,' +
-            'CASE WHEN posts.status != \'draft\' THEN posts.published_at END DESC,' +
-            'posts.updated_at DESC,' +
-            'posts.id DESC';
+            'CASE WHEN products.status != \'draft\' THEN products.published_at END DESC,' +
+            'products.updated_at DESC,' +
+            'products.id DESC';
 
-        // CASE: if the filter contains an `IN` operator, we should return the posts first, which match both tags
+        // CASE: if the filter contains an `IN` operator, we should return the products first, which match both tags
         if (options.filter && options.filter.match(/(tags|tag):\s?\[.*\]/)) {
-            order = `(SELECT count(*) FROM posts_tags WHERE post_id = posts.id) DESC, ${order}`;
+            order = `(SELECT count(*) FROM products_tags WHERE product_id = products.id) DESC, ${order}`;
         }
 
-        // CASE: if the filter contains an `IN` operator, we should return the posts first, which match both authors
-        if (options.filter && options.filter.match(/(authors|author):\s?\[.*\]/)) {
-            order = `(SELECT count(*) FROM posts_authors WHERE post_id = posts.id) DESC, ${order}`;
-        }
+        // CASE: if the filter contains an `IN` operator, we should return the products first, which match both authors
+        // if (options.filter && options.filter.match(/(authors|author):\s?\[.*\]/)) {
+        //     order = `(SELECT count(*) FROM products_authors WHERE product_id = products.id) DESC, ${order}`;
+        // }
 
         return order;
     },
@@ -796,20 +782,20 @@ Post = ghostBookshelf.Model.extend({
      * receive all fields including relations. Otherwise you can't rely on a consistent flow. And we want to avoid
      * that event listeners have to re-fetch a resource. This function is used in the context of inserting
      * and updating resources. We won't return the relations by default for now.
-     *
-     * We also always fetch posts metadata to keep current behavior consistent
+     * 
+     * We also always fetch products metadata to keep current behavior consistent
      */
     defaultRelations: function defaultRelations(methodName, options) {
         if (['edit', 'add', 'destroy'].indexOf(methodName) !== -1) {
-            options.withRelated = _.union(['authors', 'tags'], options.withRelated || []);
+            options.withRelated = _.union(['tags'], options.withRelated || []);
         }
 
-        const META_ATTRIBUTES = _.without(ghostBookshelf.model('PostsMeta').prototype.permittedAttributes(), 'id', 'post_id');
+        const META_ATTRIBUTES = _.without(ghostBookshelf.model('ProductsMeta').prototype.permittedAttributes(), 'id', 'product_id');
 
         // NOTE: only include post_meta relation when requested in 'columns' or by default
         //       optimization is needed to be able to perform .findAll on large SQLite datasets
         if (!options.columns || (options.columns && _.intersection(META_ATTRIBUTES, options.columns).length)) {
-            options.withRelated = _.union(['posts_meta'], options.withRelated || []);
+            options.withRelated = _.union(['products_meta'], options.withRelated || []);
         }
 
         return options;
@@ -828,7 +814,7 @@ Post = ghostBookshelf.Model.extend({
         _.merge(filteredData, extraData);
         return filteredData;
     },
- 
+
     // ## Model Data Functions
 
     /**
@@ -851,13 +837,13 @@ Post = ghostBookshelf.Model.extend({
 
     /**
      * ### Edit
-     * Fetches and saves to Post. See model.Base.edit
+     * Fetches and saves to Product. See model.Base.edit
      * **See:** [ghostBookshelf.Model.edit](base.js.html#edit)
      */
     edit: function edit(data, unfilteredOptions) {
         let options = this.filterOptions(unfilteredOptions, 'edit', {extraAllowedProperties: ['id']});
 
-        const editPost = () => {
+        const editProduct = () => {
             options.forUpdate = true;
 
             return ghostBookshelf.Model.edit.call(this, data, options)
@@ -880,11 +866,11 @@ Post = ghostBookshelf.Model.extend({
         if (!options.transacting) {
             return ghostBookshelf.transaction((transacting) => {
                 options.transacting = transacting;
-                return editPost();
+                return editProduct();
             });
         }
 
-        return editPost();
+        return editProduct();
     },
 
     /**
@@ -895,12 +881,12 @@ Post = ghostBookshelf.Model.extend({
     add: function add(data, unfilteredOptions) {
         let options = this.filterOptions(unfilteredOptions, 'add', {extraAllowedProperties: ['id']});
 
-        const addPost = (() => {
+        const addProduct = (() => {
             return ghostBookshelf.Model.add.call(this, data, options)
-                .then((post) => {
+                .then((product) => {
                     return this.findOne({
                         status: 'all',
-                        id: post.id
+                        id: product.id
                     }, _.merge({transacting: options.transacting}, unfilteredOptions));
                 });
         });
@@ -909,32 +895,32 @@ Post = ghostBookshelf.Model.extend({
             return ghostBookshelf.transaction((transacting) => {
                 options.transacting = transacting;
 
-                return addPost();
+                return addProduct();
             });
         }
 
-        return addPost();
+        return addProduct();
     },
 
     destroy: function destroy(unfilteredOptions) {
         let options = this.filterOptions(unfilteredOptions, 'destroy', {extraAllowedProperties: ['id']});
 
-        const destroyPost = () => {
+        const destroyProduct = () => {
             return ghostBookshelf.Model.destroy.call(this, options);
         };
 
         if (!options.transacting) {
             return ghostBookshelf.transaction((transacting) => {
                 options.transacting = transacting;
-                return destroyPost();
+                return destroyProduct();
             });
         }
 
-        return destroyPost();
+        return destroyProduct();
     },
 
     // NOTE: the `authors` extension is the parent of the post model. It also has a permissible function.
-    permissible: function permissible(postModel, action, context, unsafeAttrs, loadedPermissions, hasUserPermission, hasAppPermission, hasApiKeyPermission) {
+    permissible: function permissible(productModel, action, context, unsafeAttrs, loadedPermissions, hasUserPermission, hasAppPermission, hasApiKeyPermission) {
         let isContributor;
         let isOwner;
         let isAdmin;
@@ -945,7 +931,7 @@ Post = ghostBookshelf.Model.extend({
         let isDestroy;
 
         function isChanging(attr) {
-            return unsafeAttrs[attr] && unsafeAttrs[attr] !== postModel.get(attr);
+            return unsafeAttrs[attr] && unsafeAttrs[attr] !== productModel.get(attr);
         }
 
         function isPublished() {
@@ -953,8 +939,8 @@ Post = ghostBookshelf.Model.extend({
         }
 
         function isDraft() {
-            return postModel.get('status') === 'draft';
-        }
+            return productModel.get('status') === 'draft';
+        } 
 
         isContributor = loadedPermissions.user && _.some(loadedPermissions.user.roles, {name: 'Contributor'});
         isOwner = loadedPermissions.user && _.some(loadedPermissions.user.roles, {name: 'Owner'});
@@ -973,7 +959,7 @@ Post = ghostBookshelf.Model.extend({
             // If adding, make sure it's a draft post and has the correct ownership
             hasUserPermission = !isPublished();
         } else if (isContributor && isDestroy) {
-            // If destroying, only allow contributor to destroy their own draft posts
+            // If destroying, only allow contributor to destroy their own draft products
             hasUserPermission = isDraft();
         } else if (!(isOwner || isAdmin || isEditor || isIntegration)) {
             hasUserPermission = !isChanging('visibility');
@@ -999,14 +985,11 @@ Post = ghostBookshelf.Model.extend({
     }
 });
 
-Posts = ghostBookshelf.Collection.extend({
-    model: Post
+Products = ghostBookshelf.Collection.extend({
+    model: Product
 });
 
-// Extension for handling the logic for author + multiple authors
-Post = relations.authors.extendModel(Post, Posts, ghostBookshelf);
-
 module.exports = {
-    Post: ghostBookshelf.model('Post', Post),
-    Posts: ghostBookshelf.collection('Posts', Posts)
+    Product: ghostBookshelf.model('Product', Product),
+    Products: ghostBookshelf.collection('Products', Products)
 };

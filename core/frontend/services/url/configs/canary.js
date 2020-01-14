@@ -49,6 +49,48 @@ module.exports = [
         }
     },
     {
+        type: 'products',
+        modelOptions: {
+            modelName: 'Product',
+            filter: 'status:published+type:post',
+            exclude: [
+                'title',
+                'mobiledoc',
+                'html',
+                'plaintext',
+                // @TODO: https://github.com/TryGhost/Ghost/issues/10335
+                // 'page',
+                'status',
+                'amp',
+                'codeinjection_head',
+                'codeinjection_foot',
+                'meta_title',
+                'meta_description',
+                'custom_excerpt',
+                'og_image',
+                'og_title',
+                'og_description',
+                'twitter_image',
+                'twitter_title',
+                'twitter_description',
+                'custom_template',
+                'locale'
+            ],
+            withRelated: ['tags'],
+            withRelatedPrimary: {
+                primary_tag: 'tags'
+            },
+            withRelatedFields: {
+                tags: ['tags.id', 'tags.slug'],
+            }
+        },
+        events: {
+            add: 'product.published',
+            update: 'product.published.edited',
+            remove: 'product.unpublished'
+        }
+    },
+    {
         type: 'pages',
         modelOptions: {
             modelName: 'Post',

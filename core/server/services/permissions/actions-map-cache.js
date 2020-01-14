@@ -40,4 +40,4 @@ module.exports = {
     empty: function empty() {
         return _.size(actionsMap) === 0;
     }
-};
+}; 

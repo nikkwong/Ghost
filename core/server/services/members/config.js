@@ -19,6 +19,7 @@ function getEmailFromAddress() {
 }
 
 const getApiUrl = ({version, type}) => {
+    console.log("GET API URL")
     const {href} = new URL(
         urlUtils.getApiPath({version, type}),
         urlUtils.urlFor('admin', true)

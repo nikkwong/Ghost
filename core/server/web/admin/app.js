@@ -6,6 +6,7 @@ const constants = require('../../lib/constants');
 const urlUtils = require('../../lib/url-utils');
 const shared = require('../shared');
 const adminMiddleware = require('./middleware');
+const BF_CONFIG = require('../../../../bf-custom/config');
 
 module.exports = function setupAdminApp() {
     debug('Admin setup start');
@@ -14,6 +15,12 @@ module.exports = function setupAdminApp() {
     // Make sure 'req.secure' and `req.hostname` is valid for proxied requests
     // (X-Forwarded-Proto header will be checked, if present)
     adminApp.enable('trust proxy');
+
+    adminApp.all('*', (req,res,next) => {
+        console.log(req.path)
+        console.log(config.get('paths').clientAssets)
+        next()
+    })
 
     // Admin assets
     // @TODO ensure this gets a local 404 error handler

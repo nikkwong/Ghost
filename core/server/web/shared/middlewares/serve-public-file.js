@@ -23,6 +23,7 @@ function createPublicFileMiddleware(file, type, maxAge) {
 
             let str = buf.toString();
 
+            debugger
             if (type === 'text/xsl' || type === 'text/plain' || type === 'application/javascript') {
                 str = str.replace(blogRegex, urlUtils.urlFor('home', true).replace(/\/$/, ''));
                 str = str.replace(adminRegex, urlUtils.urlFor('admin', true).replace(/\/$/, ''));

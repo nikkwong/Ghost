@@ -26,7 +26,7 @@
             }
         },
         "description": {
-            "defaultValue": "The professional publishing platform",
+            "defaultValue": "The professional creator platform",
             "validations": {
                 "isLength": {
                     "max": 200
@@ -70,7 +70,7 @@
             "validations": {
                 "matches": "^(\/:?[a-z0-9_-]+){1,5}\/$",
                 "matches": "(:id|:slug|:year|:month|:day|:author|:primary_tag|:primary_author)",
-                "notContains": "/ghost/"
+                "notContains": "/admin/"
             }
         },
         "amp": {
@@ -86,13 +86,13 @@
             "defaultValue" : ""
         },
         "facebook": {
-            "defaultValue" : "ghost"
+            "defaultValue" : "sharebloom"
         },
         "twitter": {
-            "defaultValue" : "tryghost"
+            "defaultValue" : "sharebloom"
         },
         "labs": {
-            "defaultValue": "{}"
+            "defaultValue": "{\"members\": true}"
         },
         "navigation": {
             "defaultValue": "[{\"label\":\"Home\", \"url\":\"/\"},{\"label\":\"Tag\", \"url\":\"/tag/getting-started/\"}, {\"label\":\"Author\", \"url\":\"/author/ghost/\"},{\"label\":\"Help\", \"url\":\"https://ghost.org/docs/\"}]"
@@ -101,7 +101,7 @@
             "defaultValue": "[]"
         },
         "slack": {
-            "defaultValue": "[{\"url\":\"\", \"username\":\"Ghost\"}]"
+            "defaultValue": "[{\"url\":\"\", \"username\":\"Sharebloom\"}]"
         },
         "unsplash": {
             "defaultValue": "{\"isActive\": true}"
@@ -173,7 +173,7 @@
     },
     "theme": {
         "active_theme": {
-            "defaultValue": "casper"
+            "defaultValue": "lyra"
         }
     },
     "private": {
