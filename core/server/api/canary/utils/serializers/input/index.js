@@ -15,6 +15,10 @@ module.exports = {
         return require('./posts');
     },
 
+    get products() {
+        return require('./products');
+    },
+
     get settings() {
         return require('./settings');
     },

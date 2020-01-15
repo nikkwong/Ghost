@@ -452,17 +452,19 @@ Product = ghostBookshelf.Model.extend({
         }
 
         // ensure draft products have the send_email_when_published reset unless an email has already been sent
-        if (newStatus === 'draft' && this.hasChanged('status')) {
-            ops.push(function ensureSendEmailWhenPublishedIsUnchanged() {
-                return self.related('email').fetch({transacting: options.transacting}).then((email) => {
-                    if (email) {
-                        self.set('send_email_when_published', true);
-                    } else {
-                        self.set('send_email_when_published', false);
-                    }
-                });
-            });
-        }
+        // if (newStatus === 'draft' && this.hasChanged('status')) {
+        //     ops.push(function ensureSendEmailWhenPublishedIsUnchanged() {
+        //         // BF-TODO
+        //         return Promise.resolve()
+        //         // return self.related('email').fetch({transacting: options.transacting}).then((email) => {
+        //         //     if (email) {
+        //         //         self.set('send_email_when_published', true);
+        //         //     } else {
+        //         //         self.set('send_email_when_published', false);
+        //         //     }
+        //         // });
+        //     });
+        // }
 
         // If a title is set, not the same as the old title, a draft post, and has never been published
         if (prevTitle !== undefined && newTitle !== prevTitle && newStatus === 'draft' && !publishedAt) {

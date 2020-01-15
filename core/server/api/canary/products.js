@@ -96,7 +96,7 @@ module.exports = {
                 include: {
                     values: allowedIncludes
                 },
-                source: {
+                source: { 
                     values: ['html']
                 }
             }
@@ -105,7 +105,7 @@ module.exports = {
             unsafeAttrs: unsafeAttrs
         },
         query(frame) {
-            return models.Product.add(frame.data.posts[0], frame.options)
+            return models.Product.add(frame.data.products[0], frame.options)
                 .then((model) => {
                     if (model.get('status') !== 'published') {
                         this.headers.cacheInvalidate = false;
@@ -165,7 +165,7 @@ module.exports = {
                 }
             }
 
-            let model = await models.Product.edit(frame.data.posts[0], frame.options);
+            let model = await models.Product.edit(frame.data.products[0], frame.options);
 
             /**Handle newsletter email */
             if (model.get('send_email_when_published')) {
@@ -198,7 +198,7 @@ module.exports = {
                         relativeUrl: urlUtils.urlJoin('/p', model.get('uuid'), '/')
                     })
                 };
-            } else {
+            } else { 
                 this.headers.cacheInvalidate = false;
             }
             return model;
